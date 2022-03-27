@@ -1,0 +1,9 @@
+.graphDiv {
+    padding-left: 50;
+    padding-top: 100;
+}
+
+.GridCol {
+    display: flex;
+    flex-direction: row;
+}

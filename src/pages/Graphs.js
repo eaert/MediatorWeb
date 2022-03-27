@@ -1,28 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import { serverAddress, Colors } from '../constants'
-import { InputGroup, FormControl, Button } from 'react-bootstrap';
+import React, { useState } from 'react'
+import { serverAddress, optionsDuration, foodQuestionsID } from '../constants'
+import { InputGroup, FormControl, Button, Container, Row, Col } from 'react-bootstrap';
 import Select from "react-select";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {
-    LineChart,
-    ComposedChart,
-    ScatterChart,
-    Line,
-    Bar,
-    Scatter,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend
-  } from "recharts";
+import Graph from '../components/Graph';
+import '../css/Classes.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSquare, faCircle } from '@fortawesome/fontawesome-free-solid'
 import axios from 'axios'
-import moment from 'moment'
 
 export default function Graphs() {
     const [data, setData] = useState()
-
-    const [isDisplay, setIsDisplay] = useState()
 
     const [username, setUsername] = useState()
 
@@ -30,56 +18,52 @@ export default function Graphs() {
 
     const [selectedDuration, setSelectedDuration] = useState();
 
-    const [selectedZone, setSelectedZone] = useState();
+    // const [selectedExercise, setSelectedExercise] = useState();
+
+    // const [selectedMedications, setSelectedMedications] = useState();
 
     const optionsType = [
-        { value: {path: 'PainGraphUser', tickCountLine: 11, domainLine:[0, 10]}, label: 'Pain' },
-        { value: {path: 'VASGraphUser', tickCountLine: 11, domainLine:[0, 10]}, label: 'VAS' },
-        { value: {path: 'FoodGraphUser', tickCountLine: 2, domainLine:[0, 1]}, label: 'Food' },
-        { value: {path: 'ExerciseGraphUser', tickCountLine: 11, domainLine:[0, 300], tickCountBar: 2, domainBar:[0, 1]}, label: 'Exercise' },
+        { value: {path: 'PainGraphUser', tickCountLine: 11, domainLine:[0, 10], circleName: "Pain Level VAS (0-10)", squareName: null }, label: 'Pain'},
+        { value: {path: 'VASGraphUser', tickCountLine: 11, domainLine:[0, 10], circleName: "VAS (0-10)", squareName: null }, label: 'VAS'},
+        { value: {path: 'FoodGraphUser', tickCountLine: 2, domainLine:[0, 1], circleName: null, squareName: "Food and beverage consumption" }, label: 'Food'},
+        { value: {path: 'ExerciseGraphUser', tickCountLine: 11, domainLine:[0, 300], tickCountBar: 2, domainBar:[0, 1], circleName: "Exercise duration(mins)", squareName: "Exercise performed" }, label: 'Exercise'},
+        { value: {path: 'MediGraphUser', tickCountLine: 11, domainLine:[0, 300], tickCountBar: 2, domainBar:[0, 1], circleName: "Medication Dose", squareName: "Taken Medication" }, label: 'Medications'},
     ]
 
-    const optionsDuration = [
-        { value: 7, label: 'Week' },
-        { value: 31, label: 'Month' },
-        { value: 93, label: 'Three Month' },
-        { value: 365, label: 'Year' },
-    ]
-
-    const optionsZone = [
-        { value: 26, label: 'Breakfast'},
-        { value: 27, label: 'Lunch'},
-        { value: 28, label: 'Dinner'},
-        { value: 25, label: 'Night Meal'},
-    ]
-
-    const getData = async () => {
-        try {
+    const getData = async (arr) => {
+        var responseData = []
+        for (var i=0;i<arr.length;i++) {
             var response = await axios.post(`${serverAddress}/graphs/${selectedType.path}`, {
                 password: 'RheumaticMonitor123!',
                 username: username,
                 duration: selectedDuration,
-                questionID: selectedType.path !== 'ExerciseGraphUser' ? selectedZone : 29,
+                questionID: arr[i],
             })
-            var lineOpacity = response.data.data.content.Line ? response.data.data.content.Line.reduce((a, v) => {
-                a[v] = false
-                return a
-            }, []) : []
-            var barOpacity = response.data.data.content.Bar ? response.data.data.content.Bar.reduce((a, v) => {
-                a[v] = false
-                return a
-            }, []) : []
-            setIsDisplay({...lineOpacity, ...barOpacity})
-            setData(response.data.data)
+            if (selectedType.path === 'MediGraphUser') {
+                return response.data.data
+            }
+            responseData.push(response.data.data)
+        }
+        return responseData
+    }
+
+    const getGraphData = async () => {
+        try {
+            var responseData = await getData( selectedType.path === 'FoodGraphUser' ? foodQuestionsID : [null])
+            var newData = []
+            responseData.forEach((graph) => {
+                newData.push({
+                    info: graph,
+                    type: selectedType
+                })
+            })
+            setData(null)
+            setData([...newData])
+
         } catch (error) {
             console.log(error)
         }
     }
-
-    const handleLegendClick = (o) => {
-        const { dataKey } = o;
-        setIsDisplay({ ...isDisplay, [dataKey]: !isDisplay[o.dataKey]});
-      };
 
     return (
         <div>
@@ -94,45 +78,36 @@ export default function Graphs() {
                         />  
                 </InputGroup>
                 <Select options={optionsType} isSearchable={true} onChange={e => setSelectedType(e.value)}/>
+                {/* { selectedType && selectedType.path === 'FoodGraphUser' && <Select options={optionsExercise} onChange={e => setSelectedExercise(e.value)}/>}
+                { selectedType && selectedType.path === 'MediGraphUser' && <Select options={optionsMedications} onChange={e => setSelectedMedications(e.value)}/>} */}
                 <Select options={optionsDuration} isSearchable={true} onChange={e => setSelectedDuration(e.value)}/>
-                { selectedType && selectedType.path === 'FoodGraphUser' && <Select options={optionsZone} onChange={e => setSelectedZone(e.value)}/>}
-                <Button onClick={getData}>Click Me !</Button>
+                <Button onClick={getGraphData}>Click Me !</Button>
             </div>
-            <div style={styles.graphDiv}>
-                {data &&
-                <ComposedChart className="container"
-                    width={1000}
-                    height={400}
-                    data={data.graphData}
-                    margin={{
-                        top: 10,
-                        right: 30,
-                        left: 0,
-                        bottom: 0,
-                    }}
-                >
-        
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis yAxisId="left" name="VAS" type="number"  tickCount={selectedType.tickCountLine} domain={selectedType.domainLine}/>
-                    <YAxis yAxisId="right" name="test" orientation="right" type="number" tickCount={2} domain={[0,1]}/>
-                    <Tooltip />
-                    <Legend iconSize={28} onClick={handleLegendClick} />
-                    {data.content.Bar.map((bar, index) => {
-                        return (<Bar key={index+data.content.Line.length} hide={isDisplay[bar]} yAxisId="right" legendType='square' barSize={20} dataKey={bar} fill={Colors[index]} fillOpacity={0.5} />)
-                    })} 
-                    {data.content.Line.map((line, index) => {
-                        return (<Line key={index} yAxisId="left" type="monotone" strokeWidth={5} dataKey={line} hide={isDisplay[line]} stroke={Colors[index]} />)
-                    })} 
-                </ComposedChart>}
+            <div className='graphDiv'>
+                {/* <div className='GridCol'>
+                    {data && data.slice(0, 2).map((graph, index) => {return <Graph key={index} props={graph}></Graph>})}
+                </div> */}
+                <Container fluid>
+                    { data && data.map((graph, index) => {return <Graph key={index} props={graph}></Graph>}) }
+                </Container>
+                {selectedType && <div>
+                    <h1>
+                        {selectedType.squareName && <><FontAwesomeIcon icon={faSquare}/> = {selectedType.squareName}</>}
+                        {selectedType.circleName &&<><FontAwesomeIcon icon={faCircle}/> = {selectedType.circleName}</>}
+                    </h1>
+                </div>}
             </div>
         </div>
     )
 }
 
-const styles = {
-    graphDiv: {
-        paddingLeft: 50,
-        paddingTop: 100
-    }
-}
+// const styles = {
+//     graphDiv: {
+//         paddingLeft: 50,
+//         paddingTop: 100
+//     },
+//     GridCol: {
+//         display: flex,
+//         flex-direction: row
+//     }
+// }
