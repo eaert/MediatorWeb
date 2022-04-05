@@ -13,7 +13,7 @@ export default function MainMenu() {
 
     useEffect(() => {
       const interval = setInterval(() => {
-        setIsDisable(localStorage.isLogin)
+        setIsDisable(sessionStorage.isLogin)
       }, 1000);
       return () => clearInterval(interval);
     }, [])

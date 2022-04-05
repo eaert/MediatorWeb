@@ -16,7 +16,7 @@ export default function Login() {
     async function submit(){
         try{
             let response = await axios.post(serverAddress+`/auth/DoctorLogin`,getValues())
-            localStorage.setItem("isLogin",JSON.stringify(response.data.valid))
+            sessionStorage.setItem("isLogin",JSON.stringify(response.data.valid))
             if (response.data.valid) {
                 navigate(`/home`)
             }

@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import { serverAddress, optionsDuration, foodQuestionsID } from '../constants'
 import { InputGroup, FormControl, Button, Container, Row, Col } from 'react-bootstrap';
-import Select from "react-select";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Graph from '../components/Graph';
-import '../css/Classes.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSquare, faCircle } from '@fortawesome/fontawesome-free-solid'
+import Select from "react-select";
+import Graph from '../components/Graph';
 import axios from 'axios'
+import SwitchSelector from 'react-switch-selector';
+import DatePicker from "react-datepicker";
+
+// css imports
+import 'bootstrap/dist/css/bootstrap.min.css';
+import "react-datepicker/dist/react-datepicker.css";
+import '../css/Classes.css'
 
 export default function Graphs() {
     const [data, setData] = useState()
@@ -18,9 +23,11 @@ export default function Graphs() {
 
     const [selectedDuration, setSelectedDuration] = useState();
 
-    // const [selectedExercise, setSelectedExercise] = useState();
+    const [selectedDateType, setSelectedDateType] = useState();
 
-    // const [selectedMedications, setSelectedMedications] = useState();
+    const [startDate, setStartDate] = useState(new Date());
+
+    const [endDate, setEndDate] = useState();
 
     const optionsType = [
         { value: {path: 'PainGraphUser', tickCountLine: 11, domainLine:[0, 10], circleName: "Pain Level VAS (0-10)", squareName: null }, label: 'Pain'},
@@ -30,13 +37,31 @@ export default function Graphs() {
         { value: {path: 'MediGraphUser', tickCountLine: 11, domainLine:[0, 300], tickCountBar: 2, domainBar:[0, 1], circleName: "Medication Dose", squareName: "Taken Medication" }, label: 'Medications'},
     ]
 
+    const setDate = (date, type) => {
+        if (date > new Date()) {
+            alert('Cannot chose future Date.')
+        } else {
+            if (type === 'end') {
+                if (!startDate) {
+                    alert('Please chose Start Date first.')
+                } else if (date < startDate) {
+                    alert('End date must be bigger then start date')
+                } else {
+                    setEndDate(date)
+                }
+            } else {
+                setStartDate(date)
+            }
+        }
+    }
+
     const getData = async (arr) => {
         var responseData = []
         for (var i=0;i<arr.length;i++) {
             var response = await axios.post(`${serverAddress}/graphs/${selectedType.path}`, {
                 password: 'RheumaticMonitor123!',
                 username: username,
-                duration: selectedDuration,
+                duration: selectedDateType ? {start: startDate, end: endDate} : selectedDuration,
                 questionID: arr[i],
             })
             if (selectedType.path === 'MediGraphUser') {
@@ -49,6 +74,9 @@ export default function Graphs() {
 
     const getGraphData = async () => {
         try {
+            if (selectedDateType && (!startDate || !endDate)) {
+                alert('Must have Start and End Date on custom')
+            }
             var responseData = await getData( selectedType.path === 'FoodGraphUser' ? foodQuestionsID : [null])
             var newData = []
             responseData.forEach((graph) => {
@@ -80,7 +108,17 @@ export default function Graphs() {
                 <Select options={optionsType} isSearchable={true} onChange={e => setSelectedType(e.value)}/>
                 {/* { selectedType && selectedType.path === 'FoodGraphUser' && <Select options={optionsExercise} onChange={e => setSelectedExercise(e.value)}/>}
                 { selectedType && selectedType.path === 'MediGraphUser' && <Select options={optionsMedications} onChange={e => setSelectedMedications(e.value)}/>} */}
-                <Select options={optionsDuration} isSearchable={true} onChange={e => setSelectedDuration(e.value)}/>
+                <SwitchSelector 
+                    options={[{label: "Fixed", value: false, selectedBackgroundColor: "#0097e6"}, {label: "Custom", value: true, selectedBackgroundColor: "#fbc531"}]} 
+                    onChange={e => setSelectedDateType(e)}
+                    />
+                {selectedDateType ? 
+                    <div>
+                        <DatePicker className='dater' selected={startDate} onChange={(date) => setDate(date, 'start')} /> 
+                        <DatePicker className='dater' selected={endDate} onChange={(date) => setDate(date, 'end')} /> 
+                    </div> : 
+                    <Select options={optionsDuration} isSearchable={true} onChange={e => setSelectedDuration(e.value)}/>
+                }
                 <Button onClick={getGraphData}>Click Me !</Button>
             </div>
             <div className='graphDiv'>
