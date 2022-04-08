@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { serverAddress, optionsDuration, foodQuestionsID } from '../constants'
-import { InputGroup, FormControl, Button, Container, Row, Col } from 'react-bootstrap';
+import { InputGroup, FormControl, Button, Container } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSquare, faCircle } from '@fortawesome/fontawesome-free-solid'
 import Select from "react-select";

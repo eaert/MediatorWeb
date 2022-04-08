@@ -10,6 +10,13 @@ export const optionsDuration = [
     { value: 365, label: 'Year' },
 ]
 
+export const optionsZone = [
+    { value: 26, label: 'Breakfast'},
+    { value: 27, label: 'Lunch'},
+    { value: 28, label: 'Dinner'},
+    { value: 25, label: 'Night Meal'}
+]
+
 export const foodQuestionsID = [
     25, 26, 27, 28
 ]

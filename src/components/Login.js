@@ -22,7 +22,7 @@ export default function Login() {
             }
         }
         catch (error){
-            updateShowErrorModal(true)
+            console.log(error)
         }
     }
 
