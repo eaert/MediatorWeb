@@ -11,15 +11,35 @@ import { optionsDuration } from '../constants'
 export default function DatesRange(params) {
 
     const dispatch = useDispatch()
-    const startDate = useSelector(state => state.start)
-    const endDate = useSelector(state => state.end)
+
+    const startDate = useSelector(state => state.dates.start)
+    const endDate = useSelector(state => state.dates.end)
+
+    const setDate = (date, type) => {
+        if (date > new Date()) {
+            alert('Cannot chose future Date.')
+        } else {
+            if (type === 'end') {
+                if (!startDate) {
+                    alert('Please chose Start Date first.')
+                } else if (date < startDate) {
+                    alert('End date must be bigger then start date')
+                } else {
+                    dispatch(setEnd(date))
+                }
+            } else {
+                dispatch(setStart(date))
+                console.log(startDate)
+            }
+        }
+    }
 
     return (
         <div>
             {params.isCustom ? 
                 <div>
-                    <DatePicker className='dater' selected={startDate} onChange={(date) => dispatch(setStart(date))} /> 
-                    <DatePicker className='dater' selected={endDate} onChange={(date) => dispatch(setEnd(date))} /> 
+                    <DatePicker className='dater' selected={startDate} onChange={(date) => setDate(date, 'start')} /> 
+                    <DatePicker className='dater' selected={endDate} onChange={(date) => setDate(date, 'end')} /> 
                 </div> :
                 <Select options={optionsDuration} isSearchable={true} onChange={e => dispatch(setDuration(e.value))}/>
             }

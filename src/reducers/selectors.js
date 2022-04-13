@@ -1,9 +1,9 @@
 var initState = {
-    type: null,
-    duration: null,
-    food: null,
-    exercise: null,
-    medications: null
+    type: {},
+    duration: 0,
+    food: '',
+    exercise: '',
+    medications: ''
 }
 
 const selectorsReducer = (state=initState, action) => {
@@ -11,7 +11,7 @@ const selectorsReducer = (state=initState, action) => {
         case 'SET_TYPE':
             return {
                 ...state, 
-                type: action.payload
+                type: {...action.payload}
             };
         case 'SET_DURATION':
             return {

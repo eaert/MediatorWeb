@@ -5,7 +5,7 @@ import selectorsReducer from "./selectors";
 
 const allReducers = combineReducers({
     dates: datesReducer,
-    selector: selectorsReducer
+    selectors: selectorsReducer
 })
 
 export default allReducers
