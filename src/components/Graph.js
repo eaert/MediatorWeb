@@ -24,17 +24,7 @@ export default function Graph(props) {
       };
 
     useEffect(() => {
-        var LineDisplay = props.info.content.Line
-        var lineOpacity = LineDisplay ? LineDisplay.reduce((a, v) => {
-            a[v] = false
-            return a
-        }, []) : []
-        var BarDisplay = props.info.content.Bar
-        var barOpacity = BarDisplay ? BarDisplay.reduce((a, v) => {
-            a[v] = false
-            return a
-        }, []) : []  
-        setIsDisplay({...lineOpacity, ...barOpacity})
+        setIsDisplay(setDisplay(props.info))
         setIsLoading(false)
     }, [props])
 
@@ -70,4 +60,27 @@ export default function Graph(props) {
             </ResponsiveContainer>
         </div>
     )
+}
+
+const setDisplay = (info) => {
+    var LineDisplay = info.content.Line
+    var lineOpacity = LineDisplay ? LineDisplay.reduce((a, v) => {
+        a[v] = false
+        return a
+    }, []) : []
+    if (info.secondryType) {
+        var SecondryDisplay = info.content.Secondry
+        var secondryOpacity = SecondryDisplay ? SecondryDisplay.reduce((a, v) => {
+            a[v] = false
+            return a
+        }, []) : []
+        return { ...lineOpacity, ...secondryOpacity }
+    } else {
+        var BarDisplay = info.content.Bar
+        var barOpacity = BarDisplay ? BarDisplay.reduce((a, v) => {
+            a[v] = false
+            return a
+        }, []) : []  
+        return {...lineOpacity, ...barOpacity}
+    }
 }
