@@ -38,7 +38,6 @@ export default function Graphs() {
 
     const getGraphData = async () => {
         try {
-            console.log(participant)
             if (!username && !participant.user) {
                 alert('Must enter a Username.')
                 return
@@ -70,6 +69,7 @@ export default function Graphs() {
                 newData.push(...graph)
             }
             setData(null)
+            if (newData.length === 0) alert('No Data to Graph.') 
             setData([...newData])
 
         } catch (error) {
@@ -87,7 +87,7 @@ export default function Graphs() {
                         placeholder="Username"
                         aria-label="Username"
                         aria-describedby="basic-addon1"
-                        value={participant.user ? participant.user : ''}
+                        value={participant.user ? participant.user : null}
                         disabled={participant.user ? true : false}
                         />  
                 </InputGroup>

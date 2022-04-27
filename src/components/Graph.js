@@ -30,7 +30,7 @@ export default function Graph(props) {
 
     return (
         <div>
-            <h1>{}</h1>
+            <h1 style={{fontWeight: 'bold', fontFamily: 'cursive'}}>{props.info.title}</h1>
             <ResponsiveContainer width="100%" height={400}>
                 {!isLoading && <ComposedChart className="container"
                     data={props.info.graphData}

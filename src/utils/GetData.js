@@ -46,9 +46,11 @@ export const createGrapData = async (One, Two, flag, options) => {
                     info: {
                         content: setContent(resOne.content, med.content, flag),
                         secondryType: flag,
-                        graphData: combineJson(resOne, med)
+                        graphData: combineJson(resOne, med),
+                        title: `${resOne.title} & ${med.title}`
                     },
-                    type: graphInfo
+                    type: graphInfo,
+
                 })
             });
         } else {
@@ -57,7 +59,8 @@ export const createGrapData = async (One, Two, flag, options) => {
                 info: {
                     content: setContent(resOne.content, resTwo.content, flag),
                     secondryType: flag,
-                    graphData: combineData
+                    graphData: combineData,
+                    title: `${resOne.title} & ${resTwo.title}`
                 },
                 type: graphInfo
             })
@@ -80,7 +83,8 @@ const setContent = (first, second, flag) => {
     if (flag) {
         return {
             Line: first.Line,
-            Secondry: second.Line
+            // Secondry: second.Line
+            Bar: second.Bar
         }
     } else {
         return {
