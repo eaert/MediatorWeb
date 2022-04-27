@@ -28,7 +28,7 @@ export const createGrapData = async (One, Two, flag, options) => {
                 });
                 return data
             }
-            return [{info: resOne, type: One.path}]
+            return [{info: resOne, type: One}]
         }
         var resTwo = (await getData(Two.path, options)).data.data
         if (!resTwo) return []
