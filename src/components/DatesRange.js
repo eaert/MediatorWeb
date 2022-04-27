@@ -38,11 +38,25 @@ export default function DatesRange(params) {
         <div>
             {params.isCustom ? 
                 <div>
-                    <DatePicker className='dater' selected={startDate} onChange={(date) => setDate(date, 'start')} /> 
-                    <DatePicker className='dater' selected={endDate} onChange={(date) => setDate(date, 'end')} /> 
+                    <div style={{display: 'flex'}}>
+                        <p style={styles.text}>Start</p>
+                        <DatePicker className='dater' selected={startDate} onChange={(date) => setDate(date, 'start')} />
+                    </div>
+                    <div style={{display: 'flex'}}>
+                        <p style={styles.text}>End</p>
+                        <DatePicker className='dater' selected={endDate} onChange={(date) => setDate(date, 'end')} />
+                    </div>
                 </div> :
                 <Select options={optionsDuration} isSearchable={true} onChange={e => dispatch(setDuration(e.value))}/>
             }
         </div>
     )
+}
+
+const styles = {
+    text: {
+        fontWeight: 'bold',
+        fontSize: '20px',
+        paddingLeft: '20%'
+    }
 }

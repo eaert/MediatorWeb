@@ -13,10 +13,25 @@ export const createGrapData = async (One, Two, flag, options) => {
     try {
         var data = []
         var resOne = (await getData(One.path, options)).data.data
-        if (!Two.path) {
+        if (!resOne) return []
+        if (!Two || !flag) {
+            if (One.path === 'MediGraphUser') {
+                resOne.forEach(med => {
+                    data.push({
+                        info: {
+                            content: med.content,
+                            secondryType: flag,
+                            graphData: med.graphData
+                        },
+                        type: One
+                    })
+                });
+                return data
+            }
             return [{info: resOne, type: One.path}]
         }
         var resTwo = (await getData(Two.path, options)).data.data
+        if (!resTwo) return []
         var graphInfo = {
             tickCountLine: One.tickCountLine, 
             domainLine: One.domainLine, 

@@ -33,3 +33,8 @@ export const secondryTypeGraph = [
     { value: false, label: 'Bar'},
     { value: true, label: 'Line'},
 ]
+
+export const GraphTypesSplit = {
+    Line: ['PainGraphUser', 'VASGraphUser', 'ExerciseGraphUser', 'MediGraphUser'],
+    Bar: ['FoodGraphUser', 'ExerciseGraphUser', 'MediGraphUser']
+}

@@ -1,24 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { serverAddress, foodQuestionsID, optionsType, secondryTypeGraph } from '../constants'
-import { InputGroup, FormControl, Button, Container } from 'react-bootstrap';
+import { foodQuestionsID, optionsType, GraphTypesSplit } from '../constants';
+import { InputGroup, FormControl, Button, Container, Form } from 'react-bootstrap';
 import Select from "react-select";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSquare, faCircle } from '@fortawesome/fontawesome-free-solid'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSquare, faCircle } from '@fortawesome/fontawesome-free-solid';
 import Graph from '../components/Graph';
-import axios from 'axios'
 import SwitchSelector from 'react-switch-selector';
 
 // css imports
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "react-datepicker/dist/react-datepicker.css";
-import '../css/Classes.css'
-import Selectors from '../components/Selectors';
+import '../css/Classes.css';
 import DatesRange from '../components/DatesRange';
-import { createGrapData } from '../utils/GetData'
+import { createGrapData } from '../utils/GetData';
+
+
 
 export default function Graphs() {
 
+    const participant = useSelector(state => state.participant)
     const graphDuration = useSelector(state => state.selectors.duration)
     const graphDates = {
         start: useSelector(state => state.dates.start),
@@ -35,27 +36,29 @@ export default function Graphs() {
 
     const [selectedDateType, setSelectedDateType] = useState();
 
-    const getData = async (path, arr) => {
-        var responseData = []
-        for (var i=0;i<arr.length;i++) {
-            var response = await axios.post(`${serverAddress}/graphs/${path}`, {
-                password: 'RheumaticMonitor123!',
-                username: username,
-                duration: selectedDateType ? graphDates : graphDuration,
-                questionID: arr[i],
-            })
-            if (path === 'MediGraphUser') {
-                return response.data.data
-            }
-            responseData.push(response.data.data)
-        }
-        return responseData
-    }
-
     const getGraphData = async () => {
         try {
+            console.log(participant)
+            if (!username && !participant.user) {
+                alert('Must enter a Username.')
+                return
+            }
+            if (!graphType.One) {
+                alert('Must pick First graph type.')
+                return
+            }
+            if (secondryType) {
+                if (!GraphTypesSplit.Line.includes(graphType.One.path)) {
+                    alert('In Intervine Graphs, First Graph must be of Line type.')
+                    return
+                }
+                if (!GraphTypesSplit.Bar.includes(graphType.Two.path)) {
+                    alert('In Intervine Graphs, Second Graph must be of Bar type.')
+                    return
+                }
+            }
             var newData = []
-            var arr = graphType.One.path === 'FoodGraphUser' || graphType.Two.path === 'FoodGraphUser' ? foodQuestionsID : [0]
+            var arr = (graphType.One && graphType.One.path === 'FoodGraphUser') || (graphType.Two && graphType.Two.path === 'FoodGraphUser') ? foodQuestionsID : [0]
             for (let i=0; i<arr.length; i++) {
                 var options = {
                     password: 'RheumaticMonitor123!',
@@ -66,14 +69,6 @@ export default function Graphs() {
                 var graph = await createGrapData(graphType.One, graphType.Two, secondryType, options)
                 newData.push(...graph)
             }
-            // var responseData = await getData(graphType.One.path, graphType.One.path === 'FoodGraphUser' ? foodQuestionsID : [null])
-            // var newData = []
-            // responseData.forEach((graph) => {
-            //     newData.push({
-            //         info: graph,
-            //         type: graphType
-            //     })
-            // })
             setData(null)
             setData([...newData])
 
@@ -92,27 +87,30 @@ export default function Graphs() {
                         placeholder="Username"
                         aria-label="Username"
                         aria-describedby="basic-addon1"
+                        value={participant.user ? participant.user : ''}
+                        disabled={participant.user ? true : false}
                         />  
                 </InputGroup>
-                {/* <Selectors /> */}
-                <div style={{display: 'flex', flexDirection: 'row'}}>
-                    <Select options={optionsType} isSearchable={true} onChange={e => setGraphType({...graphType, One: {...e.value}})}/>
-                    <div>
-                        <Select options={optionsType} isSearchable={true} onChange={e => setGraphType({...graphType, Two: {...e.value}})}/>
-                        {/* <Select options={secondryTypeGraph} isSearchable={true} onChange={e => setSecondryType(e => e.value)}/> */}
-                    </div>
+                <div style={styles.padding}>
+                    <Select key={'First'} options={optionsType} isSearchable={true} onChange={e => setGraphType({...graphType, One: {...e.value}})}/>
+                    <Form.Check
+                        inline
+                        label="Secondry Graph (Bars)"
+                        name="group1"
+                        type="checkbox"
+                        id={`inline-checkbox-1`}
+                        onChange={e => setSecondryType(e.target.checked)}
+                    />
+                    <Select key={'Secondry'} style={{width:'100%', paddingLeft: '10px'}} options={optionsType} isSearchable={true} isDisabled={!secondryType} onChange={e => setGraphType({...graphType, Two: {...e.value}})}/>
                 </div>
                 <SwitchSelector 
-                    options={[{label: "Fixed", value: false, selectedBackgroundColor: "#0097e6"}, {label: "Custom", value: true, selectedBackgroundColor: "#fbc531"}]} 
+                    options={[{label: "Fixed", value: false, selectedBackgroundColor: "#0097e6"}, {label: "Set Date", value: true, selectedBackgroundColor: "#fbc531"}]} 
                     onChange={e => setSelectedDateType(e)}
                     />
-                <DatesRange {...{isCustom: selectedDateType}}/>
+                <DatesRange style={styles.padding} {...{isCustom: selectedDateType}}/>
                 <Button onClick={getGraphData}>Click Me !</Button>
             </div>
             <div className='graphDiv'>
-                {/* <div className='GridCol'>
-                    {data && data.slice(0, 2).map((graph, index) => {return <Graph key={index} props={graph}></Graph>})}
-                </div> */}
                 <Container fluid>
                     { data && data.map((graph, index) => {return <div>
                             <Graph key={index} {...graph}></Graph>
@@ -124,13 +122,11 @@ export default function Graphs() {
                             </div>
                         </div>}) }
                 </Container>
-                {/* {graphType && <div>
-                    <h1>
-                        {graphType.squareName && <><FontAwesomeIcon icon={faSquare}/> = {graphType.squareName}</>}
-                        {graphType.circleName &&<><FontAwesomeIcon icon={faCircle}/> = {graphType.circleName}</>}
-                    </h1>
-                </div>} */}
             </div>
         </div>
     )
+}
+
+const styles = {
+    padding: {paddingTop: '10px', paddingBottom: '10px'}
 }

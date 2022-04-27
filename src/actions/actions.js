@@ -1,20 +1,20 @@
 
 const setStart = (date) => {
     return {
-        type: 'SET-START',
+        type: 'SET_START',
         payload: date
     }
 }
 const setEnd = (date) => {
     return {
-        type: 'SET-END',
+        type: 'SET_END',
         payload: date
     }
 }
 
 const setType = (type) => {
     return {
-        type: 'SET-TYPE',
+        type: 'SET_TYPE',
         payload: type
     }
 }
@@ -33,8 +33,16 @@ const setFood = (food) => {
     }
 }
 
+const setParticipant = (user) => {
+    return {
+        type: 'SET_USER',
+        payload: user
+    }
+}
+
 exports.setStart = setStart
 exports.setEnd = setEnd
 exports.setType = setType
 exports.setDuration = setDuration
 exports.setFood = setFood
+exports.setParticipant = setParticipant

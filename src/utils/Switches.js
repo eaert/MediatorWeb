@@ -10,7 +10,7 @@ export default function Switches(){
         <Routes>
             <Route path={"*"} element={<Login></Login>}></Route>
             <Route path={"/home"} element={<div><h1>Home Page</h1></div>}/>
-            <Route path={"/excels"} element={<ExcelPage/>}/>
+            {/* <Route path={"/excels"} element={<ExcelPage/>}/> */}
             <Route path={"/graphs"} element={<Graphs/>}/>
 
         </Routes>
