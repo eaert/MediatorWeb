@@ -9,7 +9,8 @@ import { setType, setFood } from '../actions/actions';
 export default function Selectors(params) {
 
     const dispatch = useDispatch()
-    const selectedType = useSelector(state => state.type)
+    
+    const selectedType = useSelector(state => state.selectors.type)
 
     const optionsType = [
         { value: {path: 'PainGraphUser', tickCountLine: 11, domainLine:[0, 10], circleName: "Pain Level VAS (0-10)", squareName: null }, label: 'Pain'},
