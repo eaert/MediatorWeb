@@ -61,7 +61,7 @@ export default function Graphs() {
             for (let i=0; i<arr.length; i++) {
                 var options = {
                     password: 'RheumaticMonitor123!',
-                    username: username,
+                    username: participant.user ? participant.user : username,
                     duration: selectedDateType ? graphDates : graphDuration,
                     questionID: arr[i],
                 }
