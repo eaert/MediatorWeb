@@ -18,6 +18,8 @@ export default function Graph(props) {
 
     const [isDisplay, setIsDisplay] = useState()
 
+    const [XAxisValue, setXAxisValue] = useState()
+
     const handleLegendClick = (o) => {
         const { dataKey } = o;
         setIsDisplay({ ...isDisplay, [dataKey]: !isDisplay[o.dataKey]});
@@ -25,6 +27,7 @@ export default function Graph(props) {
 
     useEffect(() => {
         setIsDisplay(setDisplay(props.info))
+        setXAxisValue(setXAxisName(props))
         setIsLoading(false)
     }, [props])
 
@@ -45,7 +48,7 @@ export default function Graph(props) {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" label={{ value: "Dates", dy: 12}}/>
                     <YAxis yAxisId="left" name="VAS" type="number"  tickCount={props.type.tickCountLine} domain={props.type.domainLine} 
-                    label={{ value: "VAS (0-10)", position: "insideLeft", angle: -90, dx: 15}}/>
+                    label={{ value: XAxisValue, position: "insideLeft", angle: -90, dx: 15}}/>
                     <YAxis yAxisId="right" name="test" orientation="right" type="number" tickCount={2} domain={[0, 1]} 
                     label={{ value: "Yes (1) or No (0)", position: "insideLeft", angle: -90, dx: 15}}/>
                     <Tooltip />
@@ -82,5 +85,15 @@ const setDisplay = (info) => {
             return a
         }, []) : []  
         return {...lineOpacity, ...barOpacity}
+    }
+}
+
+const setXAxisName = (props) => {
+    if (props.type.path === 'ExerciseGraphUser') {
+        return 'Minutes'
+    } else if (props.type.path === 'MediGraphUser') {
+        return props.info.title
+    } else {
+        return "VAS (0-10)"
     }
 }

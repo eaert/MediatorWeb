@@ -21,7 +21,8 @@ export const createGrapData = async (One, Two, flag, options) => {
                         info: {
                             content: med.content,
                             secondryType: flag,
-                            graphData: med.graphData
+                            graphData: med.graphData,
+                            title: med.title
                         },
                         type: One
                     })
